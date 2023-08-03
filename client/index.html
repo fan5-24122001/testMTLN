@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> PHAN VĂN NAM</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <style>
+      .input-group {
+        margin: 10px 0px 10px 0px;
+      }
+      .input-group label {
+        display: block;
+        text-align: left;
+        margin: 3px;
+      }
+      .input-group input {
+        height: 30px;
+        width: 300px;
+        padding: 5px 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid gray;
+      }
+      .btn {
+        padding: 10px;
+        font-size: 15px;
+        color: white;
+        background: #5f9ea0;
+        border: none;
+        border-radius: 5px;
+      }
+      .edit {
+        padding: 10px;
+        font-size: 15px;
+        color: white;
+        background: #5f9ea0;
+        border: none;
+        border-radius: 10px;
+      }
+      .btn-orange {
+        background-color:#da7110 !important;
+        color: rgb(252, 249, 249);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color:#edf0f3 !important;
+        color: rgb(17, 1, 1);
+      }
+    </style>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $.getJSON("http://localhost:8080/api/auth.php", function (json) {
+          var tr = [];
+          for (var i = 0; i < json.datas.length; i++) {
+            tr.push("<tr>");
+            tr.push("<td>" + json.datas[i].nom + "</td>");
+            tr.push("<td>" + json.datas[i].adresse + "</td>");
+            tr.push("<td>" + json.datas[i].ville + "</td>");
+            tr.push("<td>" + json.datas[i].tel + "</td>");
+            tr.push('<td><button class="edit btn btn-primary" data-id="' + json.datas[i].id + '"><i class="bi bi-search"></i> Void</button></td>');
+            tr.push("</tr>");
+          }
+          $("table").append(tr.join(""));
+          $(".edit").on("click", function () {
+        console.log("Edit button clicked!");
+        var userId = $(this).data("id");
+        console.log("User ID:", userId);
+        // Redirect to the user_detail.html page with the selected user's ID as a parameter
+        window.location.href = "show.html?id=" + userId;
+      });
+        });
+        function searchContacts(searchTerm) {
+        $.ajax({
+          type: "POST",
+          url: "http://localhost:8080/api/auth.php",
+          data: JSON.stringify({ searchTerm: searchTerm }),
+          contentType: "application/json",
+          success: function (response) {
+            $("table").empty(); // Clear the existing table
+            var tr = [];
+            for (var i = 0; i < response.datas.length; i++) {
+              tr.push("<tr>");
+              tr.push("<td>" + response.datas[i].nom + "</td>");
+              tr.push("<td>" + response.datas[i].adresse + "</td>");
+              tr.push("<td>" + response.datas[i].ville + "</td>");
+              tr.push("<td>" + response.datas[i].tel + "</td>");
+              tr.push('<td><button class="edit btn btn-primary" data-id="' + response.datas[i].id + '"><i class="bi bi-search"></i> Void</button></td>');
+              tr.push("</tr>");
+            }
+            $("table").append(tr.join(""));
+          },
+          error: function (error) {
+            alert("Error fetching data. Please try again later.");
+          }
+        });
+      }
+  
+      $("#searchForm").on("submit", function (event) {
+        event.preventDefault();
+        var searchTerm = $("#searchTerm").val();
+        searchContacts(searchTerm);
+      });
+
+      });
+      
+    </script>
+  </head>
+  <body style="background-color: #edf0f3 !important">
+    <!-- As a link -->
+    <nav
+      style="background-color: #195da1 !important"
+      class="navbar navbar-light bg-light"
+    >
+      <a
+        style="padding: 0.5rem 12rem; color: aliceblue"
+        class="navbar-brand"
+        href="#"
+        >Rechercher un contact</a
+      >
+    </nav>
+
+    <div style="background-color: #f5f5f5  !important; max-width: 1500px; margin-top: 30px;  border: 1px solid rgb(238, 236, 236); padding: 30px 25px;" class="container"> 
+        <h1>Rechercher d'une fiche de contact</h1>
+      </div>
+      <div style="background-color: #f5f5f5 !important; max-width: 1500px; margin-top: 30px; border: 1px solid rgb(238, 236, 236); padding: 30px;" class="container d-flex justify-content-center align-items-center">
+        <div style="width: 440px;">
+            <b>Rechercher d'une fiche de contact</b>
+            <form id="searchForm">  
+                <div class="form-group">
+                  <input type="text" class="form-control"  id="searchTerm" placeholder="Search">
+                </div>
+                <div style="width: 100%; display: flex; align-items: center; justify-content: flex-end;">
+                  <button type="submit" class="btn btn-orange">Rechercher</button>
+                </div>
+              </form>
+        </div>
+    </div>
+    
+
+      <div style="background-color: #f5f5f5  !important; max-width: 1500px; margin-top: 30px;" class="container"> 
+        <table>
+            <tr>
+              <th>Nom</th>
+              <th>Address</th>
+              <th>Ville</th>
+              <th>Telephone</th>
+            </tr>
+          </table>
+      </div>
+
+      </div>
+  </body>
+</html>
